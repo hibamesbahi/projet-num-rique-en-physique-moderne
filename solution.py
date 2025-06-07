@@ -14,7 +14,7 @@ class RamsauerTownsendSimulation:
         self.nd = int(self.nt/1000) + 1
         
         
-        self.v0 = -4000  # Profondeur du puits (négative = puits vers le bas)
+        self.v0 = -4000  # Profondeur du puits 
         self.e = 5  # Rapport E/V0
         self.E = self.e * self.v0
         self.k = np.sqrt(2 * abs(self.E))
@@ -159,7 +159,7 @@ class RamsauerTownsendSimulation:
         line, = ax.plot([], [], 'b-', linewidth=2, label='Densité de probabilité')
         
        
-        # Normalisation pour affichage - le potentiel apparaîtra vers le bas
+        # Normalisation pour affichage 
         V_plot = self.V / abs(np.min(self.V)) * np.max(densities) * 0.3
         ax.plot(self.x, V_plot, 'r-', linewidth=2, label='Potentiel (normalisé)')
         
