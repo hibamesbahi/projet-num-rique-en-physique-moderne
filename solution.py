@@ -14,7 +14,7 @@ class RamsauerTownsendSimulation:
         self.nd = int(self.nt/1000) + 1
         
         
-        self.v0 = -4000  # Profondeur du puits 
+        self.v0 = -4000  # Profondeur du puits (négative = puits vers le bas)
         self.e = 5  # Rapport E/V0
         self.E = self.e * self.v0
         self.k = np.sqrt(2 * abs(self.E))
@@ -32,8 +32,8 @@ class RamsauerTownsendSimulation:
         self.setup_potential()
         
     def setup_potential(self):
-        """Configure le potentiel (puits carré)"""
-        
+        """Configure le potentiel (puits carré vers le bas)"""
+       
         self.V[(self.x >= 0.8) & (self.x <= 0.9)] = self.v0
         
     def initial_wavepacket(self):
@@ -115,7 +115,7 @@ class RamsauerTownsendSimulation:
         # Multiplication par -1/2 (unités atomiques)
         H *= -0.5
         
-        # Conditions aux bords (fonction d'onde nulle aux extrémités)
+        # Conditions aux bords 
         H[0, 0] = 1e10  # Grande valeur pour forcer psi(0) = 0
         H[-1, -1] = 1e10  # Grande valeur pour forcer psi(L) = 0
         
@@ -158,12 +158,13 @@ class RamsauerTownsendSimulation:
         
         line, = ax.plot([], [], 'b-', linewidth=2, label='Densité de probabilité')
         
-        # Tracé du potentiel
-        V_plot = self.V / np.min(self.V) * np.max(densities) * 0.3  # Normalisation pour affichage
+       
+        # Normalisation pour affichage - le potentiel apparaîtra vers le bas
+        V_plot = self.V / abs(np.min(self.V)) * np.max(densities) * 0.3
         ax.plot(self.x, V_plot, 'r-', linewidth=2, label='Potentiel (normalisé)')
         
         ax.set_xlim(0, 2)
-        ax.set_ylim(0, np.max(densities) * 1.1)
+        ax.set_ylim(np.min(V_plot) * 1.1, np.max(densities) * 1.1)  # Ajusté pour voir le puits
         ax.set_xlabel('Position x')
         ax.set_ylabel('Densité de probabilité')
         ax.legend()
@@ -195,8 +196,8 @@ class RamsauerTownsendSimulation:
             ax2.plot(self.x, eigenvectors[:, i] ** 2, 
                     label=f'État {i+1}, E = {eigenvalues[i]:.2f}')
         
-        # Tracé du potentiel
-        V_plot = self.V / np.min(self.V) * np.max(eigenvectors ** 2) * 0.5
+      
+        V_plot = self.V / abs(np.min(self.V)) * np.max(eigenvectors ** 2) * 0.5
         ax2.plot(self.x, V_plot, 'k--', linewidth=2, label='Potentiel (normalisé)')
         
         ax2.set_xlabel('Position x')
@@ -260,13 +261,13 @@ def main():
     print("Création de l'animation...")
     fig_anim, ani = sim.animate_propagation(densities)
     
-    # Graphique du potentiel seul
+    # Graphique du potentiel seul 
     fig_pot, ax_pot = plt.subplots(figsize=(10, 6))
     ax_pot.plot(sim.x, sim.V, 'r-', linewidth=3, label='Potentiel V(x)')
     ax_pot.axhline(y=0, color='k', linestyle='--', alpha=0.5)
     ax_pot.set_xlabel('Position x')
     ax_pot.set_ylabel('Potentiel V(x)')
-    ax_pot.set_title('Puits de potentiel carré')
+    ax_pot.set_title('Puits de potentiel carré (vers le bas)')
     ax_pot.legend()
     ax_pot.grid(True, alpha=0.3)
     
